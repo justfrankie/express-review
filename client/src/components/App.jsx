@@ -42,16 +42,35 @@ class App extends React.Component {
 
 
   getRestaurants() {
-    // TODO
+    axios.get("/restaurants").then(response => {
+      console.log(response.data)
+      this.setState({
+        restaurants: response.data
+      })
+    })
   }
 
-  deleteRestaurant() {
-    // TODO
+  deleteRestaurant(index) { // send a delete request to the server
+    axios.delete(`/restaurants/${index}`)
+    .then( () => this.getRestaurants())
+    .catch(err => console.error(err)) 
   }
 
-  addRestaurant() {
-    // TODO
+  /* object destructuring is equivalent of declaring this
+  {
+    name: name,
+    rating: rating
   }
+  */
+
+  addRestaurant({name, rating}) {
+    axios
+      .post("/restaurants", {
+      name, rating
+     })
+    .then(() => {this.getRestaurants()})
+    .catch((err) => {console.log(err)})
+  } // FIX SYNTAX
 
   componentDidMount() {
     this.getRestaurants();
@@ -63,10 +82,13 @@ class App extends React.Component {
       <div className="body">
         <div className="heading">Welp!</div>
         {this.state.restaurants.length ?
-          <RestaurantList restaurants={this.state.restaurants} />
+          < RestaurantList
+          restaurants={this.state.restaurants}
+          deleteRestaurant={this.deleteRestaurant} 
+          />
           :
           <div className="error">Fix your get request!</div>}
-        <AddRestaurantForm />
+        <AddRestaurantForm addRestaurant={this.addRestaurant}/>
       </div>
     )
   }
